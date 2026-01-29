@@ -4,11 +4,13 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 
 const FreedomCalc = ({ setActiveTab }) => {
-
+    const [profitPercentage, setProfitPercentage] = useState(60); // Padrão: 60% do total é lucro
     const [fireMonthly, setFireMonthly] = useState(2000)
     const [swr, setSwr] = useState(4) // Safe Withdrawal Rate
     const [showHint, setShowHint] = useState(false)
     const [postFireRate, setPostFireRate] = useState(7); // Rentabilidade esperada na reforma
+    const [showTaxInfo, setShowTaxInfo] = useState(false)
+    const conservativeNet = fireMonthly * 0.80
 
     const retirementData = useMemo(() => {
         const data = [];
@@ -36,11 +38,10 @@ const FreedomCalc = ({ setActiveTab }) => {
     // Cálculo rápido de inflação para a nota (30 anos a 2.5%)
     const futureCost = fireMonthly * Math.pow(1 + 0.025, 30)
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
             <div className="space-y-1 text-center md:text-left">
-                <h2 className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Calculadora de Independência</h2>
-                <h3 className="text-2xl font-bold text-white">Descobre o teu Objetivo</h3>
+                <h2 className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Calculadora de Independência Financeira</h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -87,7 +88,7 @@ const FreedomCalc = ({ setActiveTab }) => {
                                 </div>
                                 <input
                                     type="number"
-                                    value={fireMonthly}
+                                    value={fireMonthly === 0 ? '' : fireMonthly}
                                     onChange={(e) => setFireMonthly(Number(e.target.value))}
                                     className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-bold text-lg"
                                 />
@@ -140,7 +141,9 @@ const FreedomCalc = ({ setActiveTab }) => {
                                     {Math.round(fireTarget).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
                                 </h4>
                                 <p className="text-slate-400 text-sm mt-4">
-                                    Permite uma retirada mensal de <span className="text-white font-medium">{fireMonthly.toLocaleString('pt-PT')}€</span>.
+                                    Retirada mensal de <span className="text-white font-medium">{fireMonthly.toLocaleString('pt-PT')}€</span>
+                                    <span className="mx-2 text-slate-600">|</span>
+                                    Estimativa Líquida: <span className="text-green-400 font-medium">~{Math.round(conservativeNet).toLocaleString('pt-PT')}€</span>
                                 </p>
                             </div>
 
@@ -187,7 +190,7 @@ const FreedomCalc = ({ setActiveTab }) => {
                     </p>
 
                     {/* Info Extra Dinâmica */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="bg-slate-800/50 border border-slate-700 p-4 rounded-xl text-center">
                             <p className="text-slate-400 text-[10px] uppercase font-bold tracking-tighter">Multiplicador de Gastos</p>
                             <p className="text-xl font-bold text-slate-300 mt-1">{Math.round(100 / swr)}x Anual</p>
@@ -195,6 +198,42 @@ const FreedomCalc = ({ setActiveTab }) => {
                         <div className="bg-slate-800/50 border border-slate-700 p-4 rounded-xl text-center">
                             <p className="text-slate-400 text-[10px] uppercase font-bold">Rendimento Anual Alvo</p>
                             <p className="text-xl font-bold text-slate-300 mt-1">{(fireMonthly * 12).toLocaleString('pt-PT')}€</p>
+                        </div>
+                        <div
+                            className="bg-slate-800/50 border border-orange-500/20 p-4 rounded-xl text-center cursor-help relative group transition-all hover:bg-slate-800"
+                            onClick={() => setShowTaxInfo(!showTaxInfo)}
+                            onMouseEnter={() => setShowTaxInfo(true)}
+                            onMouseLeave={() => setShowTaxInfo(false)}
+                        >
+                            <p className="text-orange-400 text-[10px] uppercase font-bold tracking-tighter flex justify-center items-center gap-1">
+                                Carga Fiscal Est. <CircleQuestionMark size={12} className="opacity-50" />
+                            </p>
+                            <p className="text-xl font-bold text-orange-500/90 mt-1">
+                                - {Math.round(fireMonthly * 0.20).toLocaleString('pt-PT')}€
+                            </p>
+
+                            {/* Tooltip Híbrido */}
+                            {showTaxInfo && (
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 p-4 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 text-left pointer-events-none md:pointer-events-auto">
+                                    <div className="space-y-2">
+                                        <p className="text-white font-bold text-xs flex items-center gap-2">
+                                            <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                            A "Fatia" do Estado
+                                        </p>
+                                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                                            Estimamos que precises de reservar cerca de <strong>20% da tua retirada</strong> para impostos.
+                                            <br /><br />
+                                            Em Portugal, a taxa é de 28%, mas como incide apenas sobre o lucro (mais-valia), o valor real pago sobre o total costuma ser inferior.
+                                        </p>
+                                        <div className="pt-2 border-t border-slate-800 flex justify-between items-center">
+                                            <span className="text-[9px] text-slate-500 uppercase font-bold">Baseado em ~70% de Lucro</span>
+                                            <span className="text-[9px] text-orange-400 md:hidden italic">Toca para fechar</span>
+                                        </div>
+                                    </div>
+                                    {/* Seta do Balão */}
+                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 border-r border-b border-slate-700 rotate-45"></div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

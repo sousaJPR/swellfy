@@ -6,7 +6,7 @@ const Navbar = ({ activeTab, setActiveTab }) => {
         <nav className="sticky top-0 z-20 bg-slate-800/90 backdrop-blur-md border-b border-slate-700 px-4 sm:px-12 py-2 flex justify-between items-center gap-6">
             <div>
                 <h1 className="text-xl md:text-2xl font-bold flex items-center">
-                    <TrendingUp className="text-blue-500 mr-2 " />
+                    <TrendingUp className="text-blue-500 mr-2" />
                     Swell<span className="text-blue-500">fy</span>
                 </h1>
             </div>

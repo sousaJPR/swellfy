@@ -13,6 +13,8 @@ const CompoundCalc = () => {
     const totalInvested = initialValue + (monthly * 12 * years)
     const totalProfit = totalFinal - totalInvested
 
+
+
     const chartData = useMemo(() => {
         const data = [];
         for (let i = 0; i <= years; i++) {
@@ -26,10 +28,30 @@ const CompoundCalc = () => {
         }
         return data
     }, [years, initialValue, monthly, rate])
+
+
+    const milestones = useMemo(() => {
+        // 1. Primeiro Marco: 100k de saldo total
+        const first100k = chartData.find(d => d.total >= 100000)?.ano;
+
+        // 2. Efeito Bola de Neve: Quando o juro anual > aporte anual
+        const annualAporte = monthly * 12;
+        const snowballYear = chartData.find((d, i) => {
+            if (i === 0) return false;
+            const juroAnual = d.total - chartData[i - 1].total - annualAporte;
+            return juroAnual > annualAporte;
+        })?.ano;
+
+        // 3. Duplicação Real (Poder do Juro): Quando o LUCRO >= TOTAL INVESTIDO
+        // Isto significa que o teu dinheiro "se pagou a si próprio"
+        const doubleYear = chartData.find(d => (d.total - d.investido) >= d.investido)?.ano;
+
+        return { first100k, snowballYear, doubleYear };
+    }, [chartData, monthly]);
     return (
         <div className="space-y-4">
             <div className='text-center md:text-left'>
-                <h2 className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Calculadora de Juros Compostos</h2>
+                <h2 className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Calculadora Simples de Juros Compostos</h2>
             </div>
             {/* Card de Património (Hero) */}
             <div className="bg-linear-to-br from-blue-600 to-blue-900 rounded-2xl p-6 md:p-10 text-white shadow-2xl">
@@ -67,13 +89,13 @@ const CompoundCalc = () => {
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Capital Inicial</label>
-                                <input type="number" value={initialValue} onChange={(e) => setInitialValue(Number(e.target.value))}
+                                <input type="number" value={initialValue === 0 ? '' : initialValue} onChange={(e) => setInitialValue(Number(e.target.value))}
                                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
                             </div>
 
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Aporte Mensal</label>
-                                <input type="number" value={monthly} onChange={(e) => setMonthly(Number(e.target.value))}
+                                <input type="number" value={monthly === 0 ? '' : monthly} onChange={(e) => setMonthly(Number(e.target.value))}
                                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
                             </div>
 
@@ -88,7 +110,7 @@ const CompoundCalc = () => {
 
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Taxa Anual (%)</label>
-                                <input type="number" value={rate} onChange={(e) => setRate(Number(e.target.value))}
+                                <input type="number" value={rate === 0 ? '' : rate} onChange={(e) => setRate(Number(e.target.value))}
                                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
                             </div>
                         </div>
@@ -123,6 +145,43 @@ const CompoundCalc = () => {
                     </div>
                 </section>
 
+            </div>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Milestone 1: 100k */}
+                <div className="bg-slate-800/40 border border-slate-700 p-4 rounded-2xl flex flex-col items-center text-center group hover:border-blue-500/50 transition-all">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 mb-3 group-hover:scale-110 transition-transform">
+                        <span className="font-black text-xs">100k</span>
+                    </div>
+                    <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">O Primeiro Marco</p>
+                    <p className="text-white font-bold mt-1">
+                        {milestones.first100k ? `Ano ${milestones.first100k}` : '---'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1 italic leading-tight">Os primeiros 100k são os mais difíceis de acumular.</p>
+                </div>
+
+                {/* Milestone 2: Snowball Effect */}
+                <div className="bg-slate-800/40 border border-slate-700 p-4 rounded-2xl flex flex-col items-center text-center group hover:border-green-500/50 transition-all">
+                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 mb-3 group-hover:scale-110 transition-transform">
+                        <TrendingUp size={18} />
+                    </div>
+                    <p className="text-green-400/80 text-[10px] uppercase font-bold tracking-widest">Efeito Bola de Neve</p>
+                    <p className="text-white font-bold mt-1">
+                        {milestones.snowballYear ? `Ano ${milestones.snowballYear}` : '---'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1 italic leading-tight">Quando o juro anual supera os teus aportes.</p>
+                </div>
+
+                {/* Milestone 3: Double Capital */}
+                <div className="bg-slate-800/40 border border-slate-700 p-4 rounded-2xl flex flex-col items-center text-center group hover:border-purple-500/50 transition-all">
+                    <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 mb-3 group-hover:scale-110 transition-transform">
+                        <span className="font-black text-xs">x2</span>
+                    </div>
+                    <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Duplicação</p>
+                    <p className="text-white font-bold mt-1">
+                        {milestones.doubleYear ? `Ano ${milestones.doubleYear}` : '---'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 mt-1 italic leading-tight">O ano em que o teu dinheiro duplica sem esforço extra.</p>
+                </div>
             </div>
         </div>
     )

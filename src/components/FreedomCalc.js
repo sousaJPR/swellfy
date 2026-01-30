@@ -38,7 +38,7 @@ const FreedomCalc = ({ setActiveTab }) => {
     // Cálculo rápido de inflação para a nota (30 anos a 2.5%)
     const futureCost = fireMonthly * Math.pow(1 + 0.025, 30)
     return (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-4">
 
             <div className="space-y-1 text-center md:text-left">
                 <h2 className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Calculadora de Independência Financeira</h2>
@@ -70,21 +70,26 @@ const FreedomCalc = ({ setActiveTab }) => {
                                         <CircleQuestionMark className='h-[12px] w-[12px]' /> O que incluir?
                                     </button>
 
-                                    {showHint && (
-                                        <div className="absolute right-0 bottom-0 w-64 p-4 bg-slate-900 text-white text-[11px] rounded-xl shadow-2xl border border-slate-700 z-50 animate-in fade-in zoom-in-95 duration-200">
-                                            <p className="font-bold text-blue-400 mb-2 underline">Média mensal de gastos reais:</p>
-                                            <ul className="space-y-1.5 opacity-90">
-                                                <li>• Despesas Mensais Fixas * 12</li>
-                                                <li>• Seguros (Carro, Vida, Saúde)</li>
-                                                <li>• Impostos Anuais (IMI, IUC)</li>
-                                                <li>• Manutenção e Férias</li>
-                                                <li>• Prendas e Subscrições</li>
-                                            </ul>
-                                            <div className="mt-2 pt-2 border-t border-slate-700 text-slate-400 italic">
-                                                Soma os todos os pontos acima e divide por 12.
-                                            </div>
+                                    {/* Tooltip com Animação Scale */}
+                                    <div className={`
+        absolute left-0 bottom-full mb-2 w-64 p-4 bg-slate-900 text-white text-[11px] rounded-xl shadow-2xl border border-slate-700 z-50 
+        transition-all duration-200 origin-bottom-left
+        ${showHint ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}
+    `}>
+                                        <p className="font-bold text-blue-400 mb-2 underline">Média mensal de gastos reais:</p>
+                                        <ul className="space-y-1.5 opacity-90">
+                                            <li>• Despesas Mensais Fixas * 12</li>
+                                            <li>• Seguros (Carro, Vida, Saúde)</li>
+                                            <li>• Impostos Anuais (IMI, IUC)</li>
+                                            <li>• Manutenção e Férias</li>
+                                            <li>• Prendas e Subscrições</li>
+                                        </ul>
+                                        <div className="mt-2 pt-2 border-t border-slate-700 text-slate-400 italic">
+                                            Soma todos os pontos acima e divide por 12.
                                         </div>
-                                    )}
+                                        {/* Seta para apontar para o botão */}
+                                        <div className="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 border-r border-b border-slate-700 rotate-45"></div>
+                                    </div>
                                 </div>
                                 <input
                                     type="number"
@@ -244,13 +249,13 @@ const FreedomCalc = ({ setActiveTab }) => {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h4 className="text-xl font-bold text-white">Sustentabilidade do Capital</h4>
-                        <p className="text-slate-400 text-xs mt-1">Simulação de 30 anos após atingir o Objetivo</p>
+                        <p className="text-slate-400 text-xs mt-1">Simulação de 30 anos, com retiradas. Utilize o slider para simular diferentes % de retorno e perceber o impacto no capital.</p>
                     </div>
 
                     {/* Slider para taxa de retorno na reforma */}
                     <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 min-w-[200px]">
                         <div className="flex justify-between text-[10px] font-bold uppercase text-slate-400 mb-2">
-                            <span>Retorno na Reforma</span>
+                            <span>Taxa Anual (%)</span>
                             <span className="text-blue-400">{postFireRate}%</span>
                         </div>
                         <input

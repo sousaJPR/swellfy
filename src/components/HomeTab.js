@@ -61,7 +61,7 @@ const HomeTab = ({ setActiveTab }) => {
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-3">Calculadora FIRE</h3>
                     <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                        Descobre o teu "Número da Liberdade". Analisamos o teu custo de vida e aplicamos taxas de retirada seguras para garantir que o teu capital nunca se esgote.
+                        Descobre o teu "Número da Liberdade" baseado no teu custo de vida mensal. Simula as várias % de retirada e verifica também a "saúde" desse objetivo, percebendo se o estás a drenar ou se ele continuará a crescer.
                     </p>
                     <button
                         onClick={() => setActiveTab('freedom')}

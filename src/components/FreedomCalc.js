@@ -249,7 +249,7 @@ const FreedomCalc = ({ setActiveTab }) => {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h4 className="text-xl font-bold text-white">Sustentabilidade do Capital</h4>
-                        <p className="text-slate-400 text-xs mt-1">Simulação de 30 anos, com retiradas. Utilize o slider para simular diferentes % de retorno e perceber o impacto no capital.</p>
+                        <p className="text-slate-400 text-xs mt-1">Simulação de 30 anos, com retiradas. Utiliza o slider para simular diferentes % de retorno e perceber o impacto no capital.</p>
                     </div>
 
                     {/* Slider para taxa de retorno na reforma */}
